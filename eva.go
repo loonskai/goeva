@@ -17,8 +17,20 @@ func (eva *Eva) Eval(expression any) any {
 		return strExpression[1 : len(strExpression)-1]
 	}
 
-	if isValidAddition(expression.([]any)) {
-		return add(expression.([]any))
+	if isValidMathExpression(expression.([]any), "+") {
+		return eva.add(expression.([]any))
+	}
+
+	if isValidMathExpression(expression.([]any), "-") {
+		return eva.subtract(expression.([]any))
+	}
+
+	if isValidMathExpression(expression.([]any), "*") {
+		return eva.multiply(expression.([]any))
+	}
+
+	if isValidMathExpression(expression.([]any), "/") {
+		return eva.divide(expression.([]any))
 	}
 
 	panic(errors.New("invalid"))
@@ -39,13 +51,13 @@ func isSlice(expression any) bool {
 	return reflect.TypeOf(expression).Kind() == reflect.Slice
 }
 
-func isValidAddition(expression []any) bool {
-	if !isSlice(expression) || expression[0] != "+" || len(expression) < 3 {
+func isValidMathExpression(expression []any, operationSymbol string) bool {
+	if !isSlice(expression) || expression[0] != operationSymbol {
 		return false
 	}
-	addends := expression[1:]
-	for _, n := range addends {
-		if !isNumber(n) && !isValidAddition(n.([]any)) {
+	nums := expression[1:]
+	for _, n := range nums {
+		if !isNumber(n) && !isValidMathExpression(n.([]any), operationSymbol) {
 			return false
 		}
 	}
@@ -54,15 +66,48 @@ func isValidAddition(expression []any) bool {
 
 // ------ operations ----
 // TODO: Replace recursion with iteration
-func add(expression []any) int {
+func (eva *Eva) add(expression []any) int {
 	sum := 0
-	addends := expression[1:]
-	for _, n := range addends {
-		if isSlice(n) {
-			sum += add(n.([]any))
+	nums := expression[1:]
+	for _, n := range nums {
+		sum += eva.Eval(n).(int)
+	}
+	return sum
+}
+
+func (eva *Eva) subtract(expression []any) int {
+	sum := 0
+	nums := expression[1:]
+	for i, n := range nums {
+		if i == 0 {
+			sum += eva.Eval(n).(int)
 		} else {
-			sum += n.(int)
+			sum -= eva.Eval(n).(int)
 		}
 	}
 	return sum
+}
+func (eva *Eva) multiply(expression []any) int {
+	product := 1
+	nums := expression[1:]
+	for _, n := range nums {
+		product *= eva.Eval(n).(int)
+	}
+	return product
+}
+
+func (eva *Eva) divide(expression []any) int {
+	quotinent := 1
+	nums := expression[1:]
+	for i, n := range nums {
+		if i == 0 {
+			quotinent = eva.Eval(n).(int)
+		} else {
+			if n == 0 {
+				panic(errors.New("can't divide by zero"))
+			}
+			quotinent /= eva.Eval(n).(int)
+		}
+	}
+	return quotinent
 }

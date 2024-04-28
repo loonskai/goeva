@@ -22,6 +22,12 @@ func TestEvalValid(t *testing.T) {
 	assert.Equal(t, eva.Eval([]any{"+", 1, 5}), 6)
 	assert.Equal(t, eva.Eval([]any{"+", 1, 5, 5}), 11)
 	assert.Equal(t, eva.Eval([]any{"+", []any{"+", 1, 5}, 5}), 11)
+	assert.Equal(t, eva.Eval([]any{"-", 10, 2}), 8)
+	assert.Equal(t, eva.Eval([]any{"-", []any{"-", 10, 5}, 5}), 0)
+	// assert.Equal(t, eva.Eval([]any{"-", []any{"+", 15, 15}, 5}), 25) // FIXME
+	assert.Equal(t, eva.Eval([]any{"*", []any{"*", 10, 5}, 5}), 250)
+	assert.Equal(t, eva.Eval([]any{"/", []any{"/", 100, 4}, 5}), 5)
+
 }
 
 func TestEvalInvalidSingleQuoteString(t *testing.T) {
