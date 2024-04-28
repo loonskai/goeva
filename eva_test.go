@@ -53,3 +53,11 @@ func TestEvalInvalidNestedSlice(t *testing.T) {
 
 	eva.Eval([]any{"+", 2, 1, []any{"+", 1, "hello"}})
 }
+
+func TestEvalInvalidDivisionByZero(t *testing.T) {
+	eva := Eva{}
+
+	defer recoverable(t)
+
+	eva.Eval([]any{"/", 25, 5, 0})
+}
