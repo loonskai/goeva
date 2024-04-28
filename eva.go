@@ -18,12 +18,7 @@ func (eva *Eva) Eval(expression any) any {
 	}
 
 	if isValidAddition(expression.([]any)) {
-		sum := 0
-		addends := expression.([]any)[1:]
-		for _, n := range addends {
-			sum += n.(int)
-		}
-		return sum
+		return add(expression.([]any))
 	}
 
 	panic(errors.New("invalid"))
@@ -50,9 +45,24 @@ func isValidAddition(expression []any) bool {
 	}
 	addends := expression[1:]
 	for _, n := range addends {
-		if !isNumber(n) {
+		if !isNumber(n) && !isValidAddition(n.([]any)) {
 			return false
 		}
 	}
 	return true
+}
+
+// ------ operations ----
+// TODO: Replace recursion with iteration
+func add(expression []any) int {
+	sum := 0
+	addends := expression[1:]
+	for _, n := range addends {
+		if isSlice(n) {
+			sum += add(n.([]any))
+		} else {
+			sum += n.(int)
+		}
+	}
+	return sum
 }

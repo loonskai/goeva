@@ -21,6 +21,7 @@ func TestEvalValid(t *testing.T) {
 	assert.Equal(t, eva.Eval(`"hello"`), `hello`)
 	assert.Equal(t, eva.Eval([]any{"+", 1, 5}), 6)
 	assert.Equal(t, eva.Eval([]any{"+", 1, 5, 5}), 11)
+	assert.Equal(t, eva.Eval([]any{"+", []any{"+", 1, 5}, 5}), 11)
 }
 
 func TestEvalInvalidSingleQuoteString(t *testing.T) {
@@ -37,4 +38,12 @@ func TestEvalInvalidSumOfNumAndString(t *testing.T) {
 	defer recoverable(t)
 
 	eva.Eval([]any{"+", 1, "hello"})
+}
+
+func TestEvalInvalidNestedSlice(t *testing.T) {
+	eva := Eva{}
+
+	defer recoverable(t)
+
+	eva.Eval([]any{"+", 2, 1, []any{"+", 1, "hello"}})
 }
