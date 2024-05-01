@@ -27,20 +27,19 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		return env.Lookup(expression.(string))
 	}
 
-	if isValidMathExpression(expression.([]any), "+") {
-		return eva.add(expression.([]any), env)
-	}
-
-	if isValidMathExpression(expression.([]any), "-") {
-		return eva.subtract(expression.([]any), env)
-	}
-
-	if isValidMathExpression(expression.([]any), "*") {
-		return eva.multiply(expression.([]any), env)
-	}
-
-	if isValidMathExpression(expression.([]any), "/") {
-		return eva.divide(expression.([]any), env)
+	if isValidMathExpression(expression.([]any)) {
+		if expression.([]any)[0].(string) == "+" {
+			return eva.add(expression.([]any), env)
+		}
+		if expression.([]any)[0].(string) == "-" {
+			return eva.subtract(expression.([]any), env)
+		}
+		if expression.([]any)[0].(string) == "/" {
+			return eva.divide(expression.([]any), env)
+		}
+		if expression.([]any)[0].(string) == "*" {
+			return eva.multiply(expression.([]any), env)
+		}
 	}
 
 	if isValidVariableDeclaration(expression) {
@@ -69,13 +68,13 @@ func isSlice(expression any) bool {
 	return reflect.TypeOf(expression).Kind() == reflect.Slice
 }
 
-func isValidMathExpression(expression []any, operationSymbol string) bool {
-	if !isSlice(expression) || expression[0] != operationSymbol {
+func isValidMathExpression(expression []any) bool {
+	if isSlice(expression) && !isValidMathOperator(expression[0].(string)) {
 		return false
 	}
-	nums := expression[1:]
-	for _, n := range nums {
-		if !isNumber(n) && !isValidMathExpression(n.([]any), operationSymbol) {
+	terms := expression[1:]
+	for _, term := range terms {
+		if !isNumber(term) && !isValidMathExpression(term.([]any)) {
 			return false
 		}
 	}
@@ -97,6 +96,20 @@ func isVariableName(expression any) bool {
 			panic("cannot construct variables format")
 		}
 		return r.MatchString(str)
+	}
+	return false
+}
+
+func isValidMathOperator(operator string) bool {
+	switch operator {
+	case "+":
+		return true
+	case "-":
+		return true
+	case "/":
+		return true
+	case "*":
+		return true
 	}
 	return false
 }

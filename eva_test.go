@@ -28,7 +28,7 @@ func TestEvalValid(t *testing.T) {
 	assert.Equal(t, eva.Eval([]any{"+", []any{"+", 1, 5}, 5}, &eva.global), 11)
 	assert.Equal(t, eva.Eval([]any{"-", 10, 2}, &eva.global), 8)
 	assert.Equal(t, eva.Eval([]any{"-", []any{"-", 10, 5}, 5}, &eva.global), 0)
-	// assert.Equal(t, eva.Eval([]any{"-", []any{"+", 15, 15}, 5}), 25) // FIXME - different operations
+	assert.Equal(t, eva.Eval([]any{"-", []any{"+", 15, 15}, 5}, &eva.global), 25)
 	assert.Equal(t, eva.Eval([]any{"*", []any{"*", 10, 5}, 5}, &eva.global), 250)
 	assert.Equal(t, eva.Eval([]any{"/", []any{"/", 100, 4}, 5}, &eva.global), 5)
 	// Variables
