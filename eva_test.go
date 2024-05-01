@@ -108,3 +108,12 @@ func TestAccessGlobalVariable(t *testing.T) {
 
 	assert.Equal(t, eva.Eval("VERSION", nil), "0.1")
 }
+
+// ----- BLOCKS -----
+func TestEvalBlocks(t *testing.T) {
+	eva := Eva{
+		global: Environment{},
+	}
+
+	assert.Equal(t, eva.Eval([]any{"begin", []any{"var", "x", 10}, []any{"var", "y", 20}, []any{"+", []any{"*", "x", "y"}, 30}}, &eva.global), 230)
+}

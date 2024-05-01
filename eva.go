@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-	"reflect"
-	"regexp"
 )
 
 type Eva struct {
@@ -21,6 +19,10 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 	if isString(expression) {
 		strExpression := expression.(string)
 		return strExpression[1 : len(strExpression)-1]
+	}
+
+	if isBlock(expression) {
+		return eva.evalBlock(expression.([]any), env)
 	}
 
 	if isVariableName(expression) {
@@ -53,111 +55,11 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 	panic(errors.New("invalid"))
 }
 
-func isNumber(expression any) bool {
-	return reflect.TypeOf(expression).Kind() == reflect.Int
-}
-
-func isString(expression any) bool {
-	if str, ok := expression.(string); ok {
-		return str[0] == '"' && str[len(str)-1] == '"'
+func (eva *Eva) evalBlock(expression []any, env *Environment) any {
+	var result any
+	expressions := expression[1:]
+	for _, e := range expressions {
+		result = eva.Eval(e, env)
 	}
-	return false
-}
-
-func isSlice(expression any) bool {
-	return reflect.TypeOf(expression).Kind() == reflect.Slice
-}
-
-func isValidMathExpression(expression []any) bool {
-	if isSlice(expression) && !isValidMathOperator(expression[0].(string)) {
-		return false
-	}
-	terms := expression[1:]
-	for _, term := range terms {
-		if !isNumber(term) && !isValidMathExpression(term.([]any)) {
-			return false
-		}
-	}
-	return true
-}
-
-func isValidVariableDeclaration(expression any) bool {
-	return isSlice(expression) && len(expression.([]any)) > 2 && expression.([]any)[0] == "var"
-}
-
-func isValidVariableAssignement(expression any) bool {
-	return isSlice(expression) && len(expression.([]any)) > 2 && expression.([]any)[0] == "set"
-}
-
-func isVariableName(expression any) bool {
-	if str, ok := expression.(string); ok {
-		r, err := regexp.Compile(`^[a-zA-Z][a-zA-Z0-9_]*$`)
-		if err != nil {
-			panic("cannot construct variables format")
-		}
-		return r.MatchString(str)
-	}
-	return false
-}
-
-func isValidMathOperator(operator string) bool {
-	switch operator {
-	case "+":
-		return true
-	case "-":
-		return true
-	case "/":
-		return true
-	case "*":
-		return true
-	}
-	return false
-}
-
-// ------ operations ----
-// TODO: Replace recursion with iteration
-func (eva *Eva) add(expression []any, env *Environment) int {
-	sum := 0
-	nums := expression[1:]
-	for _, n := range nums {
-		sum += eva.Eval(n, env).(int)
-	}
-	return sum
-}
-
-func (eva *Eva) subtract(expression []any, env *Environment) int {
-	sum := 0
-	nums := expression[1:]
-	for i, n := range nums {
-		if i == 0 {
-			sum += eva.Eval(n, env).(int)
-		} else {
-			sum -= eva.Eval(n, env).(int)
-		}
-	}
-	return sum
-}
-func (eva *Eva) multiply(expression []any, env *Environment) int {
-	product := 1
-	nums := expression[1:]
-	for _, n := range nums {
-		product *= eva.Eval(n, env).(int)
-	}
-	return product
-}
-
-func (eva *Eva) divide(expression []any, env *Environment) int {
-	quotinent := 1
-	nums := expression[1:]
-	for i, n := range nums {
-		if i == 0 {
-			quotinent = eva.Eval(n, env).(int)
-		} else {
-			if n == 0 {
-				panic(errors.New("can't divide by zero"))
-			}
-			quotinent /= eva.Eval(n, env).(int)
-		}
-	}
-	return quotinent
+	return result
 }
