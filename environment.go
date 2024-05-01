@@ -19,7 +19,11 @@ func (env *Environment) Define(name string, value any) any {
 
 func (env *Environment) Lookup(name string) any {
 	if _, ok := env.Record[name]; !ok {
-		panic(fmt.Errorf("cannot access undeclared variable: %v", name))
+		if env.Parent != nil {
+			return env.Parent.Lookup(name)
+		} else {
+			panic(fmt.Errorf("cannot access undeclared variable: %v", name))
+		}
 	}
 	return env.Record[name]
 }

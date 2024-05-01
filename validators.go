@@ -70,5 +70,11 @@ func isValidMathOperator(operator string) bool {
 }
 
 func isBlock(expression any) bool {
-	return isSlice(expression) && expression.([]any)[0].(string) == "begin"
+	if !isSlice(expression) {
+		return false
+	}
+	if str, ok := expression.([]any)[0].(string); ok {
+		return str == "begin"
+	}
+	return false
 }

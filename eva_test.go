@@ -133,3 +133,26 @@ func TestEvalBlockShadowing(t *testing.T) {
 		"x",
 	}, &eva.global), 10)
 }
+
+func TestEvalBlockParentLookup(t *testing.T) {
+	eva := Eva{
+		global: Environment{},
+	}
+
+	assert.Equal(t, eva.Eval(
+		[]any{
+			"begin",
+			[]any{"var", "x", 10},
+			[]any{
+				"var", "result",
+				[]any{
+					"begin",
+					[]any{"var", "y", 20},
+					[]any{"var", "sum", []any{"+", "x", "y"}},
+					"sum",
+				},
+			},
+			"result",
+		}, nil),
+		30)
+}

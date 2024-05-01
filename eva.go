@@ -25,6 +25,10 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		return eva.evalBlock(expression.([]any), env)
 	}
 
+	if isValidVariableDeclaration(expression) {
+		return env.Define(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], env))
+	}
+
 	if isVariableName(expression) {
 		return env.Lookup(expression.(string))
 	}
@@ -44,12 +48,8 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		}
 	}
 
-	if isValidVariableDeclaration(expression) {
-		return env.Define(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], nil))
-	}
-
 	if isValidVariableAssignement(expression.([]any)) {
-		return env.Set(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], nil))
+		return env.Set(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], env))
 	}
 
 	panic(errors.New("invalid"))
