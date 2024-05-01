@@ -56,10 +56,13 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 }
 
 func (eva *Eva) evalBlock(expression []any, env *Environment) any {
+	blockEnv := Environment{
+		Parent: env,
+	}
 	var result any
 	expressions := expression[1:]
 	for _, e := range expressions {
-		result = eva.Eval(e, env)
+		result = eva.Eval(e, &blockEnv)
 	}
 	return result
 }

@@ -6,6 +6,7 @@ import (
 
 type Environment struct {
 	Record map[string]any
+	Parent *Environment
 }
 
 func (env *Environment) Define(name string, value any) any {

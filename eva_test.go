@@ -117,3 +117,19 @@ func TestEvalBlocks(t *testing.T) {
 
 	assert.Equal(t, eva.Eval([]any{"begin", []any{"var", "x", 10}, []any{"var", "y", 20}, []any{"+", []any{"*", "x", "y"}, 30}}, &eva.global), 230)
 }
+
+func TestEvalBlockShadowing(t *testing.T) {
+	eva := Eva{
+		global: Environment{},
+	}
+
+	assert.Equal(t, eva.Eval([]any{"begin",
+		[]any{"var", "x", 10},
+		[]any{
+			"begin",
+			[]any{"var", "x", 20},
+			[]any{"+", "x", 5},
+		},
+		"x",
+	}, &eva.global), 10)
+}
