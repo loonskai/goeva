@@ -30,7 +30,11 @@ func (env *Environment) Lookup(name string) any {
 
 func (env *Environment) Set(name string, value any) any {
 	if _, ok := env.Record[name]; !ok {
-		panic(fmt.Errorf("cannot set undeclared variable: %v", name))
+		if env.Parent != nil {
+			return env.Parent.Set(name, value)
+		} else {
+			panic(fmt.Errorf("cannot set undeclared variable: %v", name))
+		}
 	}
 	env.Record[name] = value
 	return value

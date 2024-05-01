@@ -156,3 +156,21 @@ func TestEvalBlockParentLookup(t *testing.T) {
 		}, nil),
 		30)
 }
+
+func TestEvalParentVariableAssignment(t *testing.T) {
+	eva := Eva{
+		global: Environment{},
+	}
+
+	assert.Equal(t, eva.Eval(
+		[]any{
+			"begin",
+			[]any{"var", "x", 10},
+			[]any{
+				"begin",
+				[]any{"set", "x", 20},
+			},
+			"x",
+		}, nil),
+		20)
+}
