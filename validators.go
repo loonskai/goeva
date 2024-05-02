@@ -78,3 +78,26 @@ func isBlock(expression any) bool {
 	}
 	return false
 }
+
+func isIfStatement(expression any) bool {
+	if !isSlice(expression) {
+		return false
+	}
+	if str, ok := expression.([]any)[0].(string); ok {
+		return str == "if"
+	}
+	return false
+}
+
+func isValidConditionalExpression(expression any) bool {
+	if !isSlice(expression) {
+		return false
+	}
+	if len(expression.([]any)) < 3 {
+		return false
+	}
+	if str, ok := expression.([]any)[0].(string); ok {
+		return str == ">" || str == "<" || str == "=="
+	}
+	return false
+}

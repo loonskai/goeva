@@ -29,6 +29,16 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		return env.Define(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], env))
 	}
 
+	if isIfStatement(expression) {
+		result := eva.Eval(expression.([]any)[1], env)
+		if result == true {
+			return eva.Eval(expression.([]any)[2], env)
+		}
+		if expression.([]any)[3] != nil {
+			return eva.Eval(expression.([]any)[3], env)
+		}
+	}
+
 	if isVariableName(expression) {
 		return env.Lookup(expression.(string))
 	}
@@ -48,6 +58,10 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		}
 	}
 
+	if isValidConditionalExpression(expression.([]any)) {
+		return eva.compare(expression.([]any)[0].(string), eva.Eval(expression.([]any)[1], env), eva.Eval(expression.([]any)[2], env))
+	}
+
 	if isValidVariableAssignement(expression.([]any)) {
 		return env.Set(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], env))
 	}
@@ -65,4 +79,19 @@ func (eva *Eva) evalBlock(expression []any, env *Environment) any {
 		result = eva.Eval(e, &blockEnv)
 	}
 	return result
+}
+
+func (eva *Eva) compare(operator string, x any, y any) bool {
+	if !isNumber(x) || !isNumber(y) {
+		return false
+	}
+	switch operator {
+	case ">":
+		return x.(int) > y.(int)
+	case "<":
+		return x.(int) < y.(int)
+	case "==":
+		return x.(int) == y.(int)
+	}
+	return false
 }

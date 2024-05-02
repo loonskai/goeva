@@ -174,3 +174,49 @@ func TestEvalParentVariableAssignment(t *testing.T) {
 		}, nil),
 		20)
 }
+
+func TestEvalIfExpression(t *testing.T) {
+	eva := Eva{
+		global: Environment{},
+	}
+
+	assert.Equal(t, eva.Eval(
+		[]any{
+			"begin",
+			[]any{"var", "x", 10},
+			[]any{"var", "y", 0},
+			[]any{
+				"if",
+				[]any{">", "x", 10},
+				[]any{"set", "y", 20},
+				[]any{"set", "y", 30},
+			},
+			"y",
+		}, nil), 30)
+	assert.Equal(t, eva.Eval(
+		[]any{
+			"begin",
+			[]any{"var", "x", 10},
+			[]any{"var", "y", 0},
+			[]any{
+				"if",
+				[]any{">", "x", 5},
+				[]any{"set", "y", 20},
+				[]any{"set", "y", 30},
+			},
+			"y",
+		}, nil), 20)
+	assert.Equal(t, eva.Eval(
+		[]any{
+			"begin",
+			[]any{"var", "x", 10},
+			[]any{"var", "y", 0},
+			[]any{
+				"if",
+				[]any{"==", "x", 10},
+				[]any{"set", "y", 20},
+				[]any{"set", "y", 30},
+			},
+			"y",
+		}, nil), 20)
+}
