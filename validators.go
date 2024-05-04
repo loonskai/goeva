@@ -26,7 +26,7 @@ func isValidMathExpression(expression []any) bool {
 	}
 	terms := expression[1:]
 	for _, term := range terms {
-		if isNumber(term) || isVariableName(term) {
+		if isNumber(term) || isValidVariableName(term) {
 			continue
 		}
 		if !isValidMathExpression(term.([]any)) {
@@ -44,7 +44,7 @@ func isValidVariableAssignement(expression any) bool {
 	return isSlice(expression) && len(expression.([]any)) > 2 && expression.([]any)[0] == "set"
 }
 
-func isVariableName(expression any) bool {
+func isValidVariableName(expression any) bool {
 	if str, ok := expression.(string); ok {
 		r, err := regexp.Compile(`^[a-zA-Z][a-zA-Z0-9_]*$`)
 		if err != nil {
@@ -79,7 +79,7 @@ func isBlock(expression any) bool {
 	return false
 }
 
-func isIfStatement(expression any) bool {
+func isValidStatement(expression any) bool {
 	if !isSlice(expression) {
 		return false
 	}
@@ -98,6 +98,19 @@ func isValidConditionalExpression(expression any) bool {
 	}
 	if str, ok := expression.([]any)[0].(string); ok {
 		return str == ">" || str == "<" || str == "=="
+	}
+	return false
+}
+
+func isValidWhileStatement(expression any) bool {
+	if !isSlice(expression) {
+		return false
+	}
+	if len(expression.([]any)) < 3 {
+		return false
+	}
+	if str, ok := expression.([]any)[0].(string); ok {
+		return str == "while"
 	}
 	return false
 }

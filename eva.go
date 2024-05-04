@@ -29,7 +29,7 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		return env.Define(expression.([]any)[1].(string), eva.Eval(expression.([]any)[2], env))
 	}
 
-	if isIfStatement(expression) {
+	if isValidStatement(expression) {
 		result := eva.Eval(expression.([]any)[1], env)
 		if result == true {
 			return eva.Eval(expression.([]any)[2], env)
@@ -39,7 +39,15 @@ func (eva *Eva) Eval(expression any, env *Environment) any {
 		}
 	}
 
-	if isVariableName(expression) {
+	if isValidWhileStatement(expression) {
+		var result any
+		for eva.Eval(expression.([]any)[1], env).(bool) {
+			result = eva.Eval(expression.([]any)[2], env)
+		}
+		return result
+	}
+
+	if isValidVariableName(expression) {
 		return env.Lookup(expression.(string))
 	}
 

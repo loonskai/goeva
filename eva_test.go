@@ -220,3 +220,26 @@ func TestEvalIfExpression(t *testing.T) {
 			"y",
 		}, nil), 20)
 }
+
+func TestEvalWhileExpression(t *testing.T) {
+	eva := Eva{
+		global: Environment{},
+	}
+
+	assert.Equal(t, eva.Eval(
+		[]any{
+			"begin",
+			[]any{"var", "counter", 0},
+			[]any{"var", "result", 0},
+			[]any{
+				"while",
+				[]any{"<", "counter", 10},
+				[]any{
+					"begin",
+					[]any{"set", "result", []any{"+", "result", 2}},
+					[]any{"set", "counter", []any{"+", "counter", 1}},
+				},
+			},
+			"result",
+		}, nil), 20)
+}
